@@ -1,73 +1,145 @@
-# Welcome to your Lovable project
+Invoice Generator App
 
-## Project info
+This project is a responsive Invoice Generator built with React
+, TypeScript
+, Vite
+ and Tailwind CSS
+. The application lets you enter your business information, client details, invoice items and settings, preview a professional‑looking invoice in real‑time and export the result to a PDF.
 
-**URL**: https://lovable.dev/projects/227f3692-a4c5-454b-b041-e72da369436e
+Features
 
-## How can I edit this code?
+Business & client forms – capture your business name, logo, address and contact information as well as the client’s name, company, address and contact details.
 
-There are several ways of editing your application.
+Dynamic line items – add, edit or remove as many line items as needed. Each line item includes a description, quantity and unit price; the component automatically calculates subtotals for each row.
 
-**Use Lovable**
+Invoice settings – configure the invoice number, issue date, due date, tax rate (percentage), notes, terms & conditions and payment instructions.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/227f3692-a4c5-454b-b041-e72da369436e) and start prompting.
+Real‑time preview – as you fill in the forms, the invoice preview updates instantly. Subtotals, tax and totals are calculated automatically based on your line items and tax rate.
 
-Changes made via Lovable will be committed automatically to this repo.
+Logo support – upload your company logo (PNG/JPEG) to include it in the invoice header.
 
-**Use your preferred IDE**
+PDF export – click Export to PDF to generate a PDF of the invoice preview. This uses html2canvas and jspdf under the hood to capture the preview and save it as an A4 PDF with a filename such as invoice-<invoiceNumber>.pdf
+raw.githubusercontent.com
+.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Toast notifications – success and error messages are displayed using a custom toast hook when exporting the PDF.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+How it works
 
-Follow these steps:
+Root setup – App.tsx sets up the React Router and wraps the application in QueryClientProvider and a tooltip provider. It defines the / route for the home page and a catch‑all NotFound route. The home page simply renders the InvoiceForm component.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Forms and state – InvoiceForm.tsx manages the entire invoice state using the useState hook. It supplies initial values for business details, client details, line items and settings and passes change handlers down to each form component. When you type in a field, the corresponding change handler updates the invoice state.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+BusinessForm.tsx – collects your company name, logo (uploaded with a file input and converted to a Data URI using FileReader
+raw.githubusercontent.com
+), address and contact information. Changes are passed back up via the onChange prop.
 
-# Step 3: Install the necessary dependencies.
-npm i
+ClientForm.tsx – collects the client’s name, company, address and contact information
+raw.githubusercontent.com
+.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+LineItemsForm.tsx – lets you add and remove line items. Each item has a unique ID (generated with crypto.randomUUID()), description, quantity and unit price. The form shows the amount (quantity × unit price) for each line and a button to remove the row
+raw.githubusercontent.com
+. A separate button adds a new blank row
+raw.githubusercontent.com
+.
+
+InvoiceSettings.tsx – collects the invoice number, issue date, due date, tax rate, notes, terms and payment instructions. Dates are displayed and updated as ISO strings split at the T character for the date inputs
+raw.githubusercontent.com
+. Tax rate, notes and terms are plain inputs or textareas.
+
+InvoicePreview.tsx – calculates the subtotal by summing quantity × unit price for each line item
+raw.githubusercontent.com
+, computes tax as subtotal * (taxRate / 100), and calculates the total. It displays the business details, logo, invoice number, client details, dates, a table of line items, the computed totals and any notes/terms/payment instructions
+raw.githubusercontent.com
+. This component has an id="invoice-preview" used by the PDF export function to capture the preview.
+
+PDF export – the exportToPDF function in src/utils/pdfExport.ts uses html2canvas to render the invoice preview as a canvas, converts it to a PNG and then uses jspdf to insert the image into a PDF and save it
+raw.githubusercontent.com
+. The export is triggered by the Export to PDF button in InvoiceForm and wrapped in a try…catch block with toast notifications.
+
+Getting started
+
+These instructions assume you have Node.js
+ installed (version 16+ recommended).
+
+# install dependencies
+npm install
+
+# start a development server on http://localhost:5173
 npm run dev
-```
 
-**Edit a file directly in GitHub**
+# build for production
+npm run build
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+# preview the production build
+npm run preview
 
-**Use GitHub Codespaces**
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+When you run the development server, open your browser to http://localhost:5173 to use the app. As you edit components, Vite provides hot‑module reloading.
 
-## What technologies are used for this project?
+Usage
 
-This project is built with:
+Launch the development server and navigate to the root page. You’ll see a two‑column layout: forms on the left and an invoice preview on the right.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Fill in Your Business Details with your company name, upload a logo (optional), enter your address and contact information.
 
-## How can I deploy this project?
+Fill in Client Details with the recipient’s name, company, address and contact information.
 
-Simply open [Lovable](https://lovable.dev/projects/227f3692-a4c5-454b-b041-e72da369436e) and click on Share -> Publish.
+Use the Line Items section to add invoice items. Click Add Item to create a new row and fill in the description, quantity and unit price. Remove any row using the trash‑can icon.
 
-## Can I connect a custom domain to my Lovable project?
+Under Invoice Settings, set the invoice number, issue and due dates, tax rate and optional notes, terms and payment instructions.
 
-Yes, you can!
+As you type, the invoice preview updates automatically with your entries, showing subtotals, tax and the total amount.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Once satisfied, click Export to PDF. A toast message will confirm that the PDF has been created and downloaded with a filename like invoice-INV‑12345.pdf.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Project structure (simplified)
+├── public/               # static assets and the HTML entry point
+├── src/
+│   ├── components/
+│   │   ├── BusinessForm.tsx
+│   │   ├── ClientForm.tsx
+│   │   ├── InvoiceForm.tsx    # orchestrates forms, preview and PDF export
+│   │   ├── InvoicePreview.tsx # renders the invoice preview and totals
+│   │   ├── InvoiceSettings.tsx
+│   │   └── LineItemsForm.tsx
+│   ├── pages/
+│   │   ├── Index.tsx          # home page route
+│   │   └── NotFound.tsx       # 404 page
+│   ├── hooks/
+│   │   └── use-toast.ts       # toast state management
+│   ├── types/
+│   │   └── invoice.ts         # TypeScript interfaces for invoice data
+│   └── utils/
+│       └── pdfExport.ts       # function to capture preview and export to PDF
+├── package.json             # scripts and dependencies
+└── tailwind.config.ts       # Tailwind CSS configuration
+
+Technologies used
+
+React & Vite – the application uses React 18 with Vite for fast development and builds.
+
+TypeScript – provides static typing for components and data models.
+
+Tailwind CSS – utility‑first styling for responsive layouts and consistent design.
+
+Radix UI & shadcn UI – accessible UI primitives (@radix-ui/react-*) used via the shadcn component wrappers (button, card, input, label, etc.).
+
+lucide‑react – icon library used for the add/remove item buttons.
+
+html2canvas & jsPDF – used to capture the DOM preview and generate a downloadable PDF
+raw.githubusercontent.com
+.
+
+React Router – client‑side routing between the home and 404 pages.
+
+@tanstack/react-query – included and configured in App.tsx; ready for server state management if extended.
+
+Contributing
+
+Contributions are welcome! If you notice a bug or want to propose an enhancement, feel free to open an issue or create a pull request.
+
+License
+
+This project currently does not specify a license. If you intend to contribute, please discuss licensing with the repository owner.
